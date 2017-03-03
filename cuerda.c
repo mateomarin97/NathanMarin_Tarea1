@@ -44,7 +44,7 @@ float vder(int i, float *yp,float *yf){
 
 
 float inicializar(float x){
-  return sin(2.0*pi*(float)x/(float)(N-1));
+  return sin(pi*(float)x/(float)(N-1));
 }
 
 void leapfrog(float *yp,float *yf,float *v){
