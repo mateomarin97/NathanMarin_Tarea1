@@ -1,57 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#define T 40.0
-#define rho 10.0
-#define L 100.0
-#define Np 1000
-#define h 0.1001001
-#define dimy 100000000
-#define dimv 1000
-#define c2 4.0
-#define h2 0.01002003
-#define dt 0.002
+#define N 64
+#define T 100.0
+#define b 1.0
+#define dt 0.1
+#define Nt 1000
+#define pi 3.141592654
 float inicializar(float x);
-void leapfrog(float *y,float *v);
-float vder(int i,float *y);
+void leapfrog(float *yp,float *yf,float *v);
+float vder(int i,	float *yp,float *yf);
 
 int main(){
   /*Inicializo la lista de las possicones y las velocidades*/
-  float *y;
+  float *yp;
+  float *yf;
   float *v;
   int i;
-  y=malloc(dimy*sizeof(float));
-  v=malloc(dimv*sizeof(float));
-  for(i=0;i<dimv;i++){
+  yp=malloc(N*sizeof(float));
+  yf=malloc(N*sizeof(float));
+  v=malloc(N*sizeof(float));
+  for(i=0;i<N;i++){
     v[i]=0.0;
-    y[i]=inicializar(h*i);
+    yp[i]=inicializar(i);
+    yf[i]=0.0;
   }
   /*Ahora ejecuto leapfrog*/
-  leapfrog(y,v);
-  /*Imprimo los datos*/
-  int k;
-  for(k=0;k<(dimy/dimv);k++){
-    if(k%500==0){
-      for(i=0;i<dimv;i++){
-	if(i%dimv==999){
-	  printf("%f \n",y[(k*dimv)+i]);
-	}
-	else{
-	  printf("%f ",y[(k*dimv)+i]);
-	}
-      }
-    }
-  }
-  
+  leapfrog(yp,yf,v);
+
   return 0;
 }
 
-float vder(int i, float *y){
-  if(i%dimv==0 || i%dimv==999){
+float vder(int i, float *yp,float *yf){
+  if(i==0 || i==N-1){
     return 0.0;
   }
   else{
-    return (c2/h2)*(y[i+1]-(2*y[i])+y[i-1]);
+    return (yp[i+1]-(2*yp[i])+yf[i-1])+b*(pow(yp[i+1]-yp[i],3.0)-pow(yp[i]-yf[i-1],3.0));
   }
 
 }
@@ -59,30 +44,39 @@ float vder(int i, float *y){
 
 
 float inicializar(float x){
-  if(x<=0.8*L){
-    return (float)(1.25*x)/L;
-  }
-  else{
-    return 5.0*(1-(x/L));
-  }
+  return sin(2.0*pi*(float)x/(float)(N-1));
 }
 
-void leapfrog(float *y,float *v){
+void leapfrog(float *yp,float *yf,float *v){
   float *vi;
   int i;
   int k;
 
-  vi=malloc(dimv*sizeof(float));
-  for(i=1;i<(dimy/dimv);i++){
+  vi=malloc(N*sizeof(float));
+  for(i=1;i<Nt;i++){
     /*Este for saca velocidades intermedias y posiciones finales*/
-    for(k=0;k<dimv;k++){
-      vi[k]= v[k]+(vder(((i-1)*dimv)+k,y)*(dt/2.0));
-      y[(i*dimv)+k]=y[((i-1)*dimv)+k]+(vi[k]*dt);
+    for(k=0;k<N;k++){
+      vi[k]= v[k]+(vder(k,yp,yf)*(dt/2.0));
+      yf[k]=yp[k]+(vi[k]*dt);
+    }
+
+    for(k=0;k<N;k++){
+      yp[k]=yf[k];
     }
     /*Este saca velocidades finales*/
-    for(k=0;k<dimv;k++){
-     v[k]=vi[k]+(vder((i*dimv)+k,y)*(dt/2.0));
+    for(k=0;k<N;k++){
+     v[k]=vi[k]+(vder(k,yp,yf)*(dt/2.0));
     }
-    
+    if(i%10==0){
+      for(k=0;k<N;k++){
+        if(k==N-1){
+          printf("%f \n ",yp[k]);
+        }
+        else{
+          printf("%f ",yp[k]);
+        }
+      }
+
+    }
   }
 }
