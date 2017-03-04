@@ -5,4 +5,4 @@ datos= np.loadtxt("datos.dat")
 a = datos.T
 plt.figure(figsize=(20,20))
 plt.imshow(a)
-plt.savefig("loquequiera.pdf")
+plt.savefig("grafico.pdf")
