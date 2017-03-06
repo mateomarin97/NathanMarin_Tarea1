@@ -3,10 +3,9 @@
 #include <math.h>
 #include "omp.h"
 #define N 64
-#define T 47050.68
+#define T 1000
 #define b 1.0
 #define dt 0.005
-#define Nt 9410137
 #define pi 3.141592654
 float inicializar(float x);
 void leapfrog(float *yp,float *v);
@@ -47,10 +46,11 @@ float inicializar(float x){
 }
 
 void leapfrog(float *yp,float *v){
+  int Nt= (int)(T/dt);
   float *vi;
   int i;
   int k;
-  omp_set_num_threads(4);
+  omp_set_num_threads(1);
 
   vi=malloc(N*sizeof(float));
   for(i=1;i<Nt;i++){
@@ -58,6 +58,10 @@ void leapfrog(float *yp,float *v){
     #pragma omp parallel for private(k),shared(yp,v,vi)
        for(k=0;k<N;k++){
 	 vi[k]= v[k]+(vder(k,yp)*(dt/2.0));
+       }
+
+    #pragma omp parallel for private(k),shared(yp,v,vi)
+       for(k=0;k<N;k++){
 	 yp[k]=yp[k]+(vi[k]*dt);
        }
 
