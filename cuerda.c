@@ -76,11 +76,14 @@ float w2(int k){
 
 void leapfrog(float *yp,float *v){
   int Nt= (int)(T/dt);
+  FILE *out;
   float *vi;
   int i;
   int k;
   int modulo = (int)(Nt/1000);
   omp_set_num_threads(1);
+  out =fopen("datos.dat","w");
+  fclose(out);
 
   vi=malloc(N*sizeof(float));
   for(i=1;i<Nt;i++){
@@ -101,10 +104,11 @@ void leapfrog(float *yp,float *v){
 	 v[k]=vi[k]+(vder(k,yp)*(dt/2.0));
        }
     if(i%modulo==0){
-      printf("%f ",(pow(Ap(1,v),2.0)+w2(1)*pow(A(1,yp),2.0))/2.0);
-      printf("%f ",(pow(Ap(2,v),2.0)+w2(2)*pow(A(2,yp),2.0))/2.0);
-      printf("%f \n ",(pow(Ap(3,v),2.0)+w2(3)*pow(A(3,yp),2.0))/2.0);
-	
+      out = fopen("datos.dat","a");
+      fprintf(out,"%f ",(pow(Ap(1,v),2.0)+w2(1)*pow(A(1,yp),2.0))/2.0);
+      fprintf(out,"%f ",(pow(Ap(2,v),2.0)+w2(2)*pow(A(2,yp),2.0))/2.0);
+      fprintf(out,"%f \n ",(pow(Ap(3,v),2.0)+w2(3)*pow(A(3,yp),2.0))/2.0);
+      fclose(out);
 
     }
   }
