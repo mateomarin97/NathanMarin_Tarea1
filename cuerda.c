@@ -52,9 +52,9 @@ float A(int k, float *yp){
   float suma=0;
   int i;
   for(i=0;i<N;i++){
-    suma+= yp[i]*sin((i*k*pi)/(float)(N+1));
+    suma+= yp[i]*sin((i*k*pi)/(float)(N));
   }
-  return pow(2.0/(N+1),0.5)*suma;
+  return pow(2.0/(N),0.5)*suma;
   
 }
 
@@ -62,26 +62,29 @@ float Ap(int k, float *v){
   float suma=0;
   int i;
   for(i=0;i<N;i++){
-    suma+= v[i]*sin((i*k*pi)/(float)(N+1));
+    suma+= v[i]*sin((i*k*pi)/(float)(N));
   }
-  return pow(2.0/(N+1),0.5)*suma;
+  return pow(2.0/(N),0.5)*suma;
 
 }
 /*Funcion omega al cuadrado*/
 float w2(int k){
-  return 4.0*pow(sin((k*pi)/((2.0*N)+2.0)),2.0);
+  return 4.0*pow(sin((k*pi)/((2.0*N))),2.0);
 
 }
 
 
 void leapfrog(float *yp,float *v){
+  int pro;
+  printf("Por favor de el numero de procesadores \n");
+  scanf("%d", &pro);
   int Nt= (int)(T/dt);
   FILE *out;
   float *vi;
   int i;
   int k;
   int modulo = (int)(Nt/1000);
-  omp_set_num_threads(4);
+  omp_set_num_threads(pro);
   out =fopen("datos.dat","w");
   fclose(out);
 
