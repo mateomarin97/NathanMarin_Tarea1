@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include "omp.h"
 #define N 64
 #define T 47051
@@ -8,17 +9,20 @@
 #define dt 0.005
 #define pi 3.141592654
 float inicializar(float x);
-void leapfrog(float *yp,float *v);
+void leapfrog(float *yp,float *v,int pro);
 float vder(int i,float *yp);
 float A(int k, float *yp);
 float Ap(int k, float *v);
 float w2(int k);
 
-int main(){
+int main(int argc, char *argv[]){
+  clock_t begin= clock();
   /*Inicializo la lista de las possicones y las velocidades*/
   float *yp;
   float *v;
   int i;
+  int pro;
+  pro = atoi(argv[1]);
   
   yp=malloc(N*sizeof(float));
   v=malloc(N*sizeof(float));
@@ -27,7 +31,32 @@ int main(){
     yp[i]=inicializar(i);
   }
   /*Ahora ejecuto leapfrog*/
-  leapfrog(yp,v);
+  leapfrog(yp,v,pro);
+  clock_t end =clock();
+  double time_spent = (double) (end - begin) / CLOCKS_PER_SEC;
+  FILE *t;
+  if(pro == 1){     
+     t = fopen("t1.dat","w");
+     fclose(t);
+     t = fopen("t1.dat","a");
+     fprintf(t, "%f ", time_spent);
+     fclose(t);
+  }
+  else if(pro == 2){
+     t = fopen("t2.dat","w");
+     fclose(t);
+     t = fopen("t2.dat","a");
+     fprintf(t, "%f ", time_spent);
+     fclose(t);
+  }
+  else if(pro == 4){
+     t = fopen("t4.dat","w");
+     fclose(t);
+     t = fopen("t4.dat","w");
+     fprintf(t, "%f ", time_spent);
+     fclose(t);
+  }
+  
 
   return 0;
 }
@@ -74,10 +103,7 @@ float w2(int k){
 }
 
 
-void leapfrog(float *yp,float *v){
-  int pro;
-  printf("Por favor de el numero de procesadores \n");
-  scanf("%d", &pro);
+void leapfrog(float *yp,float *v,int pro){
   int Nt= (int)(T/dt);
   FILE *out;
   float *vi;
