@@ -66,7 +66,7 @@ float vder(int i, float *yp){
     return 0.0;
   }
   else{
-    return (yp[i+1]-(2*yp[i])+yp[i-1])+b*(pow(yp[i+1]-yp[i],3.0)-pow(yp[i]-yp[i-1],3.0));
+    return (yp[i+1]-(2*yp[i])+yp[i-1])+b*(pow(yp[i+1]-yp[i],2.0)-pow(yp[i]-yp[i-1],2.0));
   }
 
 }
