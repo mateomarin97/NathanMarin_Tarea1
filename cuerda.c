@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
   /*Ahora ejecuto leapfrog*/
   leapfrog(yp,v,pro);
   clock_t end =clock();
-  double time_spent = (double) (end - begin) / (CLOCKS_PER_SEC * pro);
+  double time_spent = (double) (end - begin) / (CLOCKS_PER_SEC);
   FILE *t;
   if(pro == 1){     
      t = fopen("t1.dat","w");
